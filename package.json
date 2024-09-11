@@ -1,0 +1,90 @@
+{
+  "name": "ai-translate",
+  "displayName": "ai-translate",
+  "description": "Code Comments AI Translation,  Alibaba 大模型通义千问专用",
+  "version": "0.0.1",
+  "publisher": "cfanbo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cfanbo/ai-translate"
+  },
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ai-translate.Do",
+        "title": "AI 翻译"
+      },
+      {
+        "command": "extension.Issue",
+        "title": "Report Issue"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "ai-translate.Do",
+        "key": "ctrl+alt+t",
+        "when": "editorHasSelection",
+        "mac": "cmd+alt+t",
+        "linux": "ctrl+alt+t",
+        "win": "ctrl+alt+t"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "ai-translate.Do",
+          "when": "editorHasSelection"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "AI 翻译",
+      "properties": {
+        "ai-translate.APP_ID": {
+          "type": "string",
+          "default": "d0937fb59a64409ca70e81c0e5a5655e",
+          "description": "通义千问-应用ID（https://bailian.console.aliyun.com/#/app-center）"
+        },
+        "ai-translate.API_KEY": {
+          "type": "string",
+          "default": "sk-xxx",
+          "description": "API_KEY密钥"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.93.0",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "eslint": "^9.9.1",
+    "typescript": "^5.5.4",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
