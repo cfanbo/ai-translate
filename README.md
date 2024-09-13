@@ -1,14 +1,19 @@
-# ai-translate README
+# AI Translate
 
-`ai-translate` 是一款基于阿里巴巴通义千问的 VSCode 翻译插件，专为开发者设计。
-它的主要功能是将代码中的注释信息通过 AI 翻译成中文，翻译效果相比传统翻译工具更专业、更友好，更加贴合技术背景。
+<div style="text-align: center;">
+    <img src="https://plugins.jetbrains.com/files/25313/602650/icon/pluginIcon.svg" alt="AI Translate" />
+</div>
 
-> 如果您使用的是 JetBrains 系列的IDE工具，则需要安装对应版本的插件 https://plugins.jetbrains.com/plugin/25313-ai-translate
+`ai-translate` 是一款基于阿里巴巴大模型"通义千问"开发的 VSCode 翻译插件，专为开发者设计，主要用在IDE环境中对英文内容进行翻译。
+
+它的优势是相比传统翻译工具更专业、友好，更加贴合技术背景。
+
+> 如果您使用的是 JetBrains 系列的IDE工具，则需要安装对应IDE版本插件 https://plugins.jetbrains.com/plugin/25313-ai-translate
 
 ## Features
 
 基于AI实现更专业的翻译效果。
-例如，这里是一段对 `Raft` 代码的注释信息
+例如，这里是一段对 `Raft` 代码的注释
 ```go
 // If s.isLeader() returns true, but we fail to ensure the current
 // member's leadership, there are a couple of possibilities:
@@ -27,7 +32,9 @@ AI翻译效果
 在这种情况下，我们直接向客户端返回错误，以便客户端可以切换到另一个成员继续租约续期操作。
 ```
 
-> 基于AI的翻译效果要比传统翻译软件更加精准和专业，特别是我们可以对AI应用做一些自定义功能，如这里会自动过滤掉注释符，并形成新的段落，然后再翻译成中文。除此之外，通义千问应用还支持更多的定制化功能，如插件调用这里只是用到了一小部分而已。
+> 基于AI的翻译效果要比传统翻译软件更加精准和专业，特别是我们可以对AI应用做一些自定义功能，如这里会自动过滤掉注释符，并整理形成新的段落语句，然后再翻译成中文。
+>
+> 除此之外，通义千问应用还支持更多的定制化功能，如插件调用这里只是用到了一小部分而已。
 
 ## Requirements
 
