@@ -3,6 +3,8 @@
 `ai-translate` 是一款基于阿里巴巴通义千问的 VSCode 翻译插件，专为开发者设计。
 它的主要功能是将代码中的注释信息通过 AI 翻译成中文，翻译效果相比传统翻译工具更专业、更友好，更加贴合技术背景。
 
+> 如果您使用的是 JetBrains 系列的IDE工具，则需要安装对应版本的插件 https://plugins.jetbrains.com/plugin/25313-ai-translate
+
 ## Features
 
 基于AI实现更专业的翻译效果。
