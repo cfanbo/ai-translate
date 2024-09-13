@@ -4,6 +4,7 @@
   "description": "Code Comments AI Translation,  Alibaba 大模型通义千问专用",
   "version": "0.0.1",
   "publisher": "cfanbo",
+  "icon": "img/logo.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/cfanbo/ai-translate"
