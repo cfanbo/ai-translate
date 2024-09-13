@@ -70,6 +70,10 @@ ${documents}
 
 2. 获取 `API-KEY`, 在上图红色杠查看
 
+## install Extension
+
+访问 https://marketplace.visualstudio.com/items?itemName=cfanbo.ai-translate 一键安装
+
 ## Extension Settings
 
 在 vscode 里需要对  `ai-translate` 进行配置，将上面的应用ID 和 API-KEY, 分别填写到对应的地址
