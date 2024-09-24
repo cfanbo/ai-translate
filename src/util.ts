@@ -1,7 +1,13 @@
 import * as vscode from 'vscode';
 
+let outputChannel: vscode.OutputChannel | undefined;
+
 export function showOutputPanel(message: string) {
-    const outputChannel = vscode.window.createOutputChannel('ai-translate');
+    // 如果 outputChannel 未初始化，则创建一个新的实例
+    if (!outputChannel) {
+        outputChannel = vscode.window.createOutputChannel('ai-translate');
+    }
+    // 显示输出面板并追加消息
     outputChannel.show();
-    outputChannel.appendLine(message);
+    outputChannel.appendLine(message + "\r\n");
 }

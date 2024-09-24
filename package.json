@@ -1,13 +1,13 @@
 {
   "name": "ai-translate",
   "displayName": "ai-translate",
-  "description": "Code Comments AI Translation,  Alibaba 大模型通义千问专用",
-  "version": "0.0.2",
+  "description": "Code Comments AI Translation。支持阿里云百炼(Alibaba) 和 扣子(字节跳动)应用平台",
+  "version": "0.1.0",
   "publisher": "cfanbo",
   "icon": "img/logo.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cfanbo/ai-translate"
+    "url": "https://github.com/cfanbo/vscode-ai-translate"
   },
   "engines": {
     "vscode": "^1.93.0"
@@ -50,15 +50,47 @@
     "configuration": {
       "title": "AI 翻译",
       "properties": {
-        "ai-translate.APP_ID": {
+        "ai-translate.provider": {
           "type": "string",
-          "default": "d0937fb59a64409ca70e81c0e5a5655e",
-          "description": "通义千问-应用ID（https://bailian.console.aliyun.com/#/app-center）"
+          "enum": [
+            "bailian",
+            "coze"
+          ],
+          "enumDescriptions": [
+            "阿里云百炼",
+            "字节跳动-扣子"
+          ],
+          "default": "bailian",
+          "description": "服务提供者",
+          "order": 0
         },
-        "ai-translate.API_KEY": {
+        "ai-translate.coze.botId": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "打开 https://www.coze.cn/home, 点击左侧“个人空间”菜单，进入 Bot 的开发页面, 地址栏 URL 中 bot 参数后的数字就是 Bot ID",
+          "when": "provider == 'coze'",
+          "order": 3
+        },
+        "ai-translate.coze.token": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "点击 https://www.coze.cn/open/api 生成令牌",
+          "when": "provider == 'coze'",
+          "order": 4
+        },
+        "ai-translate.bailian.APP_ID": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "阿里云百炼-应用ID, 点击 https://bailian.console.aliyun.com/#/app-center 获取ID",
+          "when": "provider == 'bailian'",
+          "order": 1
+        },
+        "ai-translate.bailian.API_KEY": {
           "type": "string",
           "default": "sk-xxx",
-          "description": "API_KEY密钥"
+          "markdownDescription": "以 `sk-` 为前缀的字符串, 点击 https://bailian.console.aliyun.com/?apiKey=1#/api-key 查看",
+          "when": "provider == 'bailian'",
+          "order": 2
         }
       }
     }

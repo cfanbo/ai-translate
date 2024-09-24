@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { sendHttpRequest } from './http'; // 假设 httpService.ts 在同一目录下
-import { showOutputPanel } from './util';
+import { clearOutputPanel, showOutputPanel } from './util';
 
 var Loading = false;
 
@@ -47,21 +47,16 @@ export function activate(context: vscode.ExtensionContext) {
 		// const loadingMessage = vscode.window.setStatusBarMessage('AI服务器正在处理，请稍候...')
 		const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
 		statusBarItem.show();
-		statusBarItem.text = ` 👾 AI服务器正在拼命的思考...`
+		statusBarItem.text = ` 👾 AI服务器正在拼命的运行...`
 
 		// 使用封装的函数发送 HTTP 请求
 		try {
 			const response = await sendHttpRequest({
-				method: 'POST',
-				data: {
-					'input': {
-						'prompt': selectedText
-					}
-				}
+				input: selectedText,
 			});
 
 			console.log(response);
-			let body = response.output.text
+			let body = response.text
 			showOutputPanel(body);
 		} catch (error) {
 			vscode.window.showErrorMessage('Failed to fetch data.');
