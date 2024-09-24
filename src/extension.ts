@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { sendHttpRequest } from './http'; // 假设 httpService.ts 在同一目录下
-import { clearOutputPanel, showOutputPanel } from './util';
+import { showOutputPanel } from './util';
 
 var Loading = false;
 
