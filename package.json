@@ -61,7 +61,7 @@
             "字节跳动-扣子"
           ],
           "default": "bailian",
-          "description": "服务提供者",
+          "description": "服务提供商",
           "order": 0
         },
         "ai-translate.coze.botId": {
