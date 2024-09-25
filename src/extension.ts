@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { sendHttpRequest } from './http'; // 假设 httpService.ts 在同一目录下
 import { showOutputPanel } from './util';
+import { ConfigurationError } from './error';
 
 var Loading = false;
 
@@ -59,7 +60,22 @@ export function activate(context: vscode.ExtensionContext) {
 			let body = response.text
 			showOutputPanel(body);
 		} catch (error) {
-			vscode.window.showErrorMessage('Failed to fetch data.');
+			if (error instanceof ConfigurationError) {
+				console.error(error.message);
+				// 提示用户进行配置
+				vscode.window.showWarningMessage(
+					error.message + '\n 是否立即打开插件配置界面？',
+					{ modal: true }, // 设置为 modal 确保对话框是模态的
+					'确认'
+				).then(selection => {
+					if (selection === '确认') {
+						vscode.commands.executeCommand('workbench.action.openSettings', 'ai-translate');
+					}
+				});
+			} else {
+				// 请求错误
+				vscode.window.showErrorMessage('Failed to fetch data.');
+			}
 		}
 
 		Loading = false

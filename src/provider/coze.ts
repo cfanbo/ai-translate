@@ -1,12 +1,20 @@
 import axios from 'axios';
 import { Provider } from './provider';
 import { RequestConfig } from '../http'
+import { ConfigurationError } from '../error';
 
 export default class CozeProvider implements Provider {
     private botId: string;
     private token: string;
 
     constructor(botId: string, token: string) {
+        if (!botId) {
+            throw new ConfigurationError("botId 不能为空");
+        }
+        if (!token) {
+            throw new ConfigurationError("token 不能为空");
+        }
+
         this.botId = botId;
         this.token = token;
     }
