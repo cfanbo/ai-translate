@@ -64,26 +64,32 @@
           "description": "服务提供商",
           "order": 0
         },
+        "ai-translate.stream": {
+          "type": "boolean",
+          "default": false,
+          "description": "启用流式输出",
+          "order": 1
+        },
         "ai-translate.coze.botId": {
           "type": "string",
           "default": "",
           "markdownDescription": "打开 https://www.coze.cn/home, 点击左侧“个人空间”菜单，进入 Bot 的开发页面, 地址栏 URL 中 bot 参数后的数字就是 Bot ID",
           "when": "provider == 'coze'",
-          "order": 3
+          "order": 4
         },
         "ai-translate.coze.token": {
           "type": "string",
           "default": "",
           "markdownDescription": "点击 https://www.coze.cn/open/api 生成令牌",
           "when": "provider == 'coze'",
-          "order": 4
+          "order": 5
         },
         "ai-translate.bailian.APP_ID": {
           "type": "string",
           "default": "",
           "markdownDescription": "阿里云百炼-应用ID, 点击 https://bailian.console.aliyun.com/#/app-center 获取ID",
           "when": "provider == 'bailian'",
-          "order": 1
+          "order": 2
         },
         "ai-translate.bailian.API_KEY": {
           "type": "string",
@@ -122,6 +128,7 @@
   },
   "dependencies": {
     "axios": "^1.7.7",
-    "debug": "^4.3.7"
+    "debug": "^4.3.7",
+    "stream": "^0.0.3"
   }
 }

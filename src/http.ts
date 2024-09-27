@@ -15,9 +15,9 @@ export interface RequestConfig {
  * @param config 请求配置对象
  * @returns Promise 包含响应数据
  */
-export async function sendHttpRequest(config: RequestConfig): Promise<any> {
+export async function sendHttpRequest(config: RequestConfig,  onDataCallback: (chunk: string) => void): Promise<any> {
     try {
-        const provider = createProvider();
+        const provider = createProvider(onDataCallback);
         const response = await provider.sendRequest(config);
         return response;
     } catch (error) {
@@ -27,15 +27,16 @@ export async function sendHttpRequest(config: RequestConfig): Promise<any> {
 }
 
 
-function createProvider(): Provider {
+function createProvider(onDataCallback: (chunk: string) => void): Provider {
     // 获取扩展的配置
     const ext_config = vscode.workspace.getConfiguration('ai-translate');
     const provider = ext_config.get<string>('provider'); // 获取 provider 配置
+    const streamEnabled = ext_config.get<boolean>('stream') || false;
 
     if (provider === 'bailian') {
         const APP_ID = ext_config.get<string>('bailian.APP_ID') || '';
         const API_KEY = ext_config.get<string>('bailian.API_KEY') || '';
-        return new BailianProvider(APP_ID, API_KEY);
+        return new BailianProvider(APP_ID, API_KEY, streamEnabled, onDataCallback);
     } else if (provider === 'coze') {
         const botId = ext_config.get<string>('coze.botId') || '';
         const token = ext_config.get<string>('coze.token') || '';

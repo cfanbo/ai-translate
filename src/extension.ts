@@ -52,13 +52,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// 使用封装的函数发送 HTTP 请求
 		try {
-			const response = await sendHttpRequest({
+			await sendHttpRequest({
 				input: selectedText,
-			});
+			}, showOutputPanel);
 
-			console.log(response);
-			let body = response.text
-			showOutputPanel(body);
 		} catch (error) {
 			if (error instanceof ConfigurationError) {
 				console.error(error.message);

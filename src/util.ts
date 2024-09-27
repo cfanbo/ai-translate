@@ -9,5 +9,5 @@ export function showOutputPanel(message: string) {
     }
     // 显示输出面板并追加消息
     outputChannel.show();
-    outputChannel.appendLine(message + "\r\n");
+    outputChannel.append(message);
 }
