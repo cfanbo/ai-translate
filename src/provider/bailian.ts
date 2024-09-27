@@ -1,8 +1,10 @@
+import * as vscode from 'vscode';
 import axios from 'axios';
 import { Readable } from 'stream';
 import { Provider } from './provider';
 import { RequestConfig } from '../http';
 import { ConfigurationError } from '../error';
+import { showOutputPanel } from '../util';
 
 export default class BailianProvider implements Provider {
     private APP_ID: string;
@@ -10,7 +12,7 @@ export default class BailianProvider implements Provider {
     private streamEnabled: boolean;
     private onDataCallback: (chunk: string) => void;  // 回调函数
 
-    constructor(appId: string, apiKey: string, streamEnabled: boolean, onDataCallback: (chunk: string) => void) {
+    constructor(appId: string, apiKey: string) {
         if (!appId) {
             throw new ConfigurationError("配置错误：appId 不能为空");
         }
@@ -18,10 +20,14 @@ export default class BailianProvider implements Provider {
             throw new ConfigurationError("配置错误：apiKey 不能为空");
         }
 
+        // 流式输出
+        const ext_config = vscode.workspace.getConfiguration('ai-translate');
+        const streamEnabled = ext_config.get<boolean>('stream') || false;
+
         this.APP_ID = appId;
         this.API_KEY = apiKey;
         this.streamEnabled = streamEnabled;
-        this.onDataCallback = onDataCallback;
+        this.onDataCallback = showOutputPanel;
     }
 
     async sendRequest(config: RequestConfig, onData?: (chunk: string) => void): Promise<any> {
