@@ -63,7 +63,7 @@ export default class BailianProvider implements Provider {
                     let usedIndex = 0;
                     stream.on('data', (chunk: Buffer) => {
                         const chunkStr = chunk.toString();
-                        console.log('Received chunk:', chunkStr);
+                        // console.log('Received chunk:', chunkStr);
 
                         const match = chunkStr.match(/data:(.*)/);
                         if (match && match[1]) {
