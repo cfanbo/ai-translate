@@ -66,7 +66,7 @@
         },
         "ai-translate.stream": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "启用流式输出",
           "order": 1
         },
