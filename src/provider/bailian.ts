@@ -31,15 +31,13 @@ export default class BailianProvider implements Provider {
     }
 
     async sendRequest(config: RequestConfig, onData?: (chunk: string) => void): Promise<any> {
-        let headers = {
+        let headers: { 'Content-Type': string; Authorization: string; Accept?: string } = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + this.API_KEY,
-        }
+        };
+
         if (this.streamEnabled) {
-            headers = {
-                ...headers,
-                'Accept': 'text/event-stream'
-            };
+            headers['Accept'] = 'text/event-stream'; // 在这里直接设置
         }
 
         let url = `https://dashscope.aliyuncs.com/api/v1/apps/${this.APP_ID}/completion`;
