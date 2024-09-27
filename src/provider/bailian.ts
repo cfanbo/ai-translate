@@ -84,7 +84,7 @@ export default class BailianProvider implements Provider {
                     stream.on('end', () => {
                         console.log("stream data finished")
                         if (usedIndex > 0) {
-                            this.onDataCallback("\r\n");
+                            this.onDataCallback("\r\n\r\n");
                         }
                         resolve({ text: "complete" });
                     });
