@@ -4,7 +4,7 @@ import { Readable } from 'stream';
 import { Provider } from './provider';
 import { RequestConfig } from '../http';
 import { ConfigurationError } from '../error';
-import { showOutputPanel } from '../util';
+import { showOutputPanel, finishOutputPanel } from '../util';
 
 export default class BailianProvider implements Provider {
     private APP_ID: string;
@@ -51,6 +51,9 @@ export default class BailianProvider implements Provider {
                 data: {
                     'input': {
                         'prompt': config.input
+                    },
+                    parameters: {
+                        incremental_output: this.streamEnabled
                     }
                 },
                 responseType: this.streamEnabled ? 'stream' : 'json'
@@ -60,7 +63,6 @@ export default class BailianProvider implements Provider {
                 return new Promise((resolve, reject) => {
                     const stream = response.data as Readable;
 
-                    let usedIndex = 0;
                     stream.on('data', (chunk: Buffer) => {
                         const chunkStr = chunk.toString();
                         // console.log('Received chunk:', chunkStr);
@@ -70,11 +72,8 @@ export default class BailianProvider implements Provider {
                             try {
                                 const jsonData = JSON.parse(match[1].trim());
                                 let text = jsonData.output.text;
+                                this.onDataCallback(text);  // 调用回调函数
 
-                                let newText = text.substring(usedIndex)
-                                this.onDataCallback(newText);  // 调用回调函数
-
-                                usedIndex = text.length
                             } catch (error) {
                                 console.error('Failed to parse JSON:', error);
                             }
@@ -83,9 +82,7 @@ export default class BailianProvider implements Provider {
 
                     stream.on('end', () => {
                         console.log("stream data finished")
-                        if (usedIndex > 0) {
-                            this.onDataCallback("\r\n\r\n");
-                        }
+                        finishOutputPanel();
                         resolve({ text: "complete" });
                     });
 
@@ -95,6 +92,7 @@ export default class BailianProvider implements Provider {
                 });
             } else {
                 this.onDataCallback(response.data.output.text)
+                finishOutputPanel();
                 return { text: response.data.output.text };
             }
         } catch (error) {

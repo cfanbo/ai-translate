@@ -11,3 +11,7 @@ export function showOutputPanel(message: string) {
     outputChannel.show();
     outputChannel.append(message);
 }
+
+export function finishOutputPanel() {
+    showOutputPanel("\r\n\r\n");
+}
