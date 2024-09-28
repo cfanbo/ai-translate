@@ -4,7 +4,7 @@ import { Readable } from 'stream';
 import { Provider } from './provider';
 import { RequestConfig } from '../http'
 import { ConfigurationError } from '../error';
-import { showOutputPanel } from '../util';
+import { showOutputPanel, finishOutputPanel } from '../util';
 
 export default class CozeProvider implements Provider {
     private botId: string;
@@ -128,7 +128,8 @@ export default class CozeProvider implements Provider {
                         console.log("stream data finished")
                         if (bufferText.length > 0) {
                             // console.log(bufferText);
-                            this.onDataCallback(bufferText + "\r\n\r\n");
+                            this.onDataCallback(bufferText);
+                            finishOutputPanel();
                         }
                         resolve({ text: bufferText });
                     });
@@ -146,7 +147,8 @@ export default class CozeProvider implements Provider {
                         await this.check_session_status(response.data.data.conversation_id, response.data.data.id)
                         // 2. 获取最后一次bot响应
                         let content = await this.fetch_llm_response(response.data.data.conversation_id, response.data.data.id)
-                        this.onDataCallback(content + "\r\n\r\n");
+                        this.onDataCallback(content);
+                        finishOutputPanel();
                         return { text: content }
                     } catch (error) {
                         throw error;
