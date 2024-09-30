@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { Provider } from './provider/provider';
 import BailianProvider from './provider/bailian';
 import CozeProvider from './provider/coze';
+import LLMProvider from './provider/llm';
 
 export interface RequestConfig {
     input?: any;
@@ -15,9 +16,9 @@ export interface RequestConfig {
  * @param config 请求配置对象
  * @returns Promise 包含响应数据
  */
-export async function sendHttpRequest(config: RequestConfig, onDataCallback: (chunk: string) => void): Promise<any> {
+export async function sendHttpRequest(config: RequestConfig): Promise<any> {
     try {
-        const provider = createProvider(onDataCallback);
+        const provider = createProvider();
         const response = await provider.sendRequest(config);
         return response;
     } catch (error) {
@@ -27,7 +28,7 @@ export async function sendHttpRequest(config: RequestConfig, onDataCallback: (ch
 }
 
 
-function createProvider(onDataCallback: (chunk: string) => void): Provider {
+function createProvider(): Provider {
     // 获取扩展的配置
     const ext_config = vscode.workspace.getConfiguration('ai-translate');
     const provider = ext_config.get<string>('provider'); // 获取 provider 配置
@@ -40,6 +41,8 @@ function createProvider(onDataCallback: (chunk: string) => void): Provider {
         const botId = ext_config.get<string>('coze.botId') || '';
         const token = ext_config.get<string>('coze.token') || '';
         return new CozeProvider(botId, token);
+    } else if (provider == 'LLM') {
+        return new LLMProvider();
     } else {
         throw new Error(`Unsupported provider: ${provider}`);
     }

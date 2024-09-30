@@ -4,13 +4,151 @@ import * as vscode from 'vscode';
 import { sendHttpRequest } from './http'; // 假设 httpService.ts 在同一目录下
 import { showOutputPanel } from './util';
 import { ConfigurationError } from './error';
+import Anthropic from '@anthropic-ai/sdk';
 
 var Loading = false;
+
+// 服务商模型静态配置
+interface ServiceProviderItem {
+	name: string;
+	baseurl: string;
+	apikey: string;
+	models: string[];
+	description: string;
+}
+const serviceProvidersConfig: { [key: string]: ServiceProviderItem } = {
+	openai: {
+		name: "OpenAI",
+		baseurl: 'https://api.openai.com/v1',
+		apikey: 'OpenAI',
+		models: ["gpt-3.5-turbo", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-1106", "gpt-3.5-turbo-0613", "gpt-4-1106-preview", "gpt-4-0125-preview", "gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4"],
+		description: "openai"
+	},
+	anthropic: {
+		name: "Anthropic",
+		baseurl: 'https://api.anthropic.com/',
+		apikey: 'Anthropic',
+		models: ['claude-3-5-sonnet-20240620', 'claude-3-haiku-20240307', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229'],
+		description: "https://docs.anthropic.com/en/docs/welcome"
+	},
+	// deepl: {
+	// 	name: "DeepL",
+	// 	baseurl: '',
+	// 	apikey: 'DeepL',
+	// 	models: [],
+	// 	description: ""
+	// },
+	// aws: {
+	// 	name: "AWS",
+	// 	baseurl: 'https://aws.io/openai/',
+	// 	apikey: 'yyyyyyy',
+	// 	models: [],
+	// 	description: ""
+	// },
+	glm: {
+		name: "GLM",
+		baseurl: "https://open.bigmodel.cn/api/paas/v4",
+		apikey: 'GLM',
+		models: ['codegeex-4', 'glm-4-flash', 'glm-4v-plus', 'glm-4-0520', 'glm-4-long', 'glm-4v', 'glm-4-air', 'glm-4', 'glm-4-9b', 'glm-4-flashx'],
+		description: ""
+	},
+	doubao: {
+		name: "Doubao",
+		baseurl: 'https://ark.cn-beijing.volces.com/api/v3',
+		apikey: 'Doubao',
+		models: [],
+		description: ""
+	},
+	deepseek: {
+		name: "Deepseek",
+		baseurl: 'https://api.deepseek.com',
+		apikey: 'Deepseek',
+		models: ["deepseek-chat", "deepseek-coder"],
+		description: "https://platform.deepseek.com/api_keys"
+	},
+	dashscope: {
+		name: "Dashscope",
+		baseurl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+		apikey: 'Dashscope',
+		models: ['qwen-max', 'qwen-plus', 'qwen-turbo', 'qwen-long'],
+		description: ""
+	},
+	// azure: {
+	// 	name: "azure",
+	// 	baseurl: 'https://api.cognitive.microsofttranslator.com/',
+	// 	apikey: 'azure',
+	// 	models: [],
+	// 	description: "https://learn.microsoft.com/zh-cn/azure/ai-services/translator/"
+	// },
+	github: {
+		name: "GitHub",
+		baseurl: 'https://models.inference.ai.azure.com',
+		apikey: 'github',
+		models: ['gpt-4o', 'gpt-4o-mini', "Meta-Llama-3.1-405B-Instruct", "Meta-Llama-3.1-70B-Instruct", "Meta-Llama-3.1-8B-Instruct", "Meta-Llama-3-70B-Instruct", "Meta-Llama-3-8B-Instruct", "Mistral-Nemo", "Mistral-large", "Mistral-large-2407", "Mistral-small"],
+		description: "https://gh.io/models"
+	},
+	gemini: {
+		name: "Gemini",
+		baseurl: '',
+		apikey: '',
+		models: ['gemini-1.0-pro-latest', 'gemini-1.0-pro-002', "gemini-1.0-pro-001", "gemini-1.5-pro-latest", "gemini-1.5-flash"],
+		description: ""
+	},
+};
+
+// 更新模型选项
+function updateModels() {
+	// 获取所有配置属性
+	const currentConfig = vscode.workspace.getConfiguration();
+	let selectedProviderName = currentConfig.get<string>('ai-translate.LLM.ServiceProvider') || "";
+	selectedProviderName = selectedProviderName.toLowerCase()
+	console.log("selectedProviderName:", selectedProviderName)
+
+	const selectedProvider = serviceProvidersConfig[selectedProviderName];
+	console.log("selectedProvider: ", selectedProvider);
+	if (selectedProvider) {
+		currentConfig.update('ai-translate.LLM.model', '', vscode.ConfigurationTarget.Global);
+		vscode.workspace.getConfiguration().update('ai-translate.LLM.baseUrl', selectedProvider.baseurl, vscode.ConfigurationTarget.Global);
+
+		updateModelDropdown(selectedProvider);
+	}
+}
+
+function updateModelDropdown(provider: ServiceProviderItem) {
+	const modelConfigKey = 'ai-translate.LLM.model';
+	const models = provider.models
+	const currentModel = vscode.workspace.getConfiguration().get(modelConfigKey);
+
+	const modelDropdown: vscode.QuickPickItem[] = models.map(model => ({
+		label: model,
+		description: currentModel === model ? '(当前选择)' : ''
+	}));
+
+	if (modelDropdown.length == 0) {
+		return;
+	}
+
+	vscode.window.showQuickPick(modelDropdown, {
+		placeHolder: 'Choosing a model',
+		canPickMany: false
+	}).then(selected => {
+		if (selected) {
+			vscode.workspace.getConfiguration().update(modelConfigKey, selected.label, vscode.ConfigurationTarget.Global);
+		}
+	});
+}
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
+	// const config = vscode.workspace.getConfiguration();
+	context.subscriptions.push(
+		vscode.workspace.onDidChangeConfiguration(e => {
+			if (e.affectsConfiguration('ai-translate.LLM.ServiceProvider')) {
+				updateModels();
+			}
+		})
+	);
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
@@ -54,7 +192,7 @@ export function activate(context: vscode.ExtensionContext) {
 		try {
 			await sendHttpRequest({
 				input: selectedText,
-			}, showOutputPanel);
+			});
 
 		} catch (error) {
 			if (error instanceof ConfigurationError) {
@@ -71,7 +209,10 @@ export function activate(context: vscode.ExtensionContext) {
 				});
 			} else {
 				// 请求错误
-				vscode.window.showErrorMessage('Failed to fetch data.');
+				// vscode.window.showErrorMessage('Failed to fetch data.' + error.message);
+				// 请求错误
+				const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+				vscode.window.showErrorMessage('Failed to fetch data: \n' + errorMessage);
 			}
 		}
 

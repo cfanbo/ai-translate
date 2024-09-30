@@ -1,8 +1,8 @@
 {
   "name": "ai-translate",
-  "displayName": "ai-translate",
-  "description": "Code Comments AI Translation。支持阿里云百炼(Alibaba) 和 扣子(字节跳动)应用平台",
-  "version": "0.1.3",
+  "displayName": "AI Translate",
+  "description": "Translate this text from English to Chinese, supporting text with comment symbols.",
+  "version": "0.2.0",
   "publisher": "cfanbo",
   "icon": "img/logo.png",
   "repository": {
@@ -16,7 +16,18 @@
     "Programming Languages",
     "Other"
   ],
-  "activationEvents": [],
+  "keywords": [
+    "comment",
+    "OpenAI",
+    "AI",
+    "translate",
+    "Software engineer",
+    "LLM",
+    "AI Translation"
+  ],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -48,19 +59,21 @@
       ]
     },
     "configuration": {
-      "title": "AI 翻译",
+      "title": "AI Translate",
       "properties": {
         "ai-translate.provider": {
           "type": "string",
           "enum": [
+            "LLM",
             "bailian",
             "coze"
           ],
           "enumDescriptions": [
-            "阿里云百炼",
-            "字节跳动-扣子"
+            "阿里云百炼 AI Agent",
+            "字节跳动-扣子 AI Agent",
+            "Large Languages Model"
           ],
-          "default": "bailian",
+          "default": "LLM",
           "description": "服务提供商",
           "order": 0
         },
@@ -68,35 +81,98 @@
           "type": "boolean",
           "default": true,
           "description": "启用流式输出",
-          "order": 1
+          "order": 2
+        },
+        "ai-translate.LLM.ServiceProvider": {
+          "enum": [
+            "OpenAI",
+            "Anthropic",
+            "GLM",
+            "Doubao",
+            "Deepseek",
+            "DashScope",
+            "GitHub",
+            "Gemini"
+          ],
+          "enumDescriptions": [
+            "OpenAI",
+            "Anthropic",
+            "智谱 GLM 大模型",
+            "字节跳动 豆包 大模型",
+            "DeepSeek",
+            "阿里云百炼",
+            "Github gh.io/models",
+            "Google Gemini"
+          ],
+          "default": "OpenAI",
+          "description": "Translate Service Provider",
+          "when": "ai-translate.provider == 'LLM'",
+          "order": 10
+        },
+        "ai-translate.LLM.baseUrl": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "服务商的 Base URL",
+          "when": "ai-translate.LLM.ServiceProvider == 'LLM'",
+          "order": 11
+        },
+        "ai-translate.LLM.apiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "服务商的 API Key",
+          "when": "ai-translate.LLM.ServiceProvider == 'LLM'",
+          "order": 12
+        },
+        "ai-translate.LLM.model": {
+          "type": "string",
+          "default": "deepseek-chat",
+          "markdownDescription": "选择模型, 可更改模型",
+          "when": "ai-translate.LLM.ServiceProvider == 'LLM'",
+          "order": 13
+        },
+        "ai-translate.LLM.maxTokens": {
+          "type": "number",
+          "default": 1024,
+          "markdownDescription": "生成文本的最大长度, 介绍文档 [max_tokens](https://platform.openai.com/docs/api-reference/completions/create#completions-create-max_tokens)",
+          "when": "ai-translate.LLM.ServiceProvider == 'LLM'",
+          "order": 14
+        },
+        "ai-translate.LLM.Temperature": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.0,
+          "maximum": 2.0,
+          "markdownDescription": "控制生成文本的随机性. 值越大文本越随机, 推荐设置为1.  介绍文档 [temperature](https://platform.openai.com/docs/api-reference/completions/create#completions-create-temperature)",
+          "when": "ai-translate.LLM.ServiceProvider == 'LLM'",
+          "order": 14
         },
         "ai-translate.coze.botId": {
           "type": "string",
           "default": "",
-          "markdownDescription": "打开 https://www.coze.cn/home, 点击左侧“个人空间”菜单，进入 Bot 的开发页面, 地址栏 URL 中 bot 参数后的数字就是 Bot ID",
-          "when": "provider == 'coze'",
-          "order": 4
+          "markdownDescription": "打开 https://www.coze.cn/home, 点击左侧“个人空间”菜单, 进入 Bot 的开发页面, 地址栏 URL 中 bot 参数后的数字就是 Bot ID",
+          "when": "ai-translate.provider == 'coze'",
+          "order": 20
         },
         "ai-translate.coze.token": {
           "type": "string",
           "default": "",
           "markdownDescription": "点击 https://www.coze.cn/open/api 生成令牌",
-          "when": "provider == 'coze'",
-          "order": 5
+          "when": "ai-translate.provider == 'coze'",
+          "order": 21
         },
         "ai-translate.bailian.APP_ID": {
           "type": "string",
           "default": "",
           "markdownDescription": "阿里云百炼-应用ID, 点击 https://bailian.console.aliyun.com/#/app-center 获取ID",
-          "when": "provider == 'bailian'",
-          "order": 2
+          "when": "ai-translate.provider == 'bailian'",
+          "order": 30
         },
         "ai-translate.bailian.API_KEY": {
           "type": "string",
           "default": "sk-xxx",
           "markdownDescription": "以 `sk-` 为前缀的字符串, 点击 https://bailian.console.aliyun.com/?apiKey=1#/api-key 查看",
-          "when": "provider == 'bailian'",
-          "order": 2
+          "when": "ai-translate.provider == 'bailian'",
+          "order": 31
         }
       }
     }
@@ -127,8 +203,10 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.27.3",
     "axios": "^1.7.7",
     "debug": "^4.3.7",
+    "openai": "^4.65.0",
     "stream": "^0.0.3"
   }
 }
