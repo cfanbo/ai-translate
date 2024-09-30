@@ -95,7 +95,7 @@ export default class LLMProvider implements Provider {
         Translate the following source text to ${this.target_language}, Output translation directly without any additional text.
         First Remove all comment symbols and their associated content. Ensure that any text following comment symbols (e.g., //, /*, <!--, etc.) is completely removed from the document.
         Reorganize the paragraphs. Rearrange the remaining text into well-structured paragraphs, ensuring that the content flows logically and coherently.
-    Source Text: ${text}gi
+    Source Text: ${text}
     Translated Text:
         `;
 
