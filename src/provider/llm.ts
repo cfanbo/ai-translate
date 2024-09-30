@@ -170,9 +170,12 @@ export default class LLMProvider implements Provider {
 
             if (this.options.stream) {
                 let fullResponse = "";
-                for await (const event of response) {
-                    if (event.type === "content_block_delta") {
-                        const content = event.delta?.text || "";
+
+                let resp = response as AsyncIterable<Anthropic.Messages.RawMessageStreamEvent>
+                for await (const chunk of resp) {
+                    if (chunk.type === "content_block_delta") {
+                        let delta = chunk.delta as Anthropic.Messages.TextDelta;
+                        const content = delta?.text || "";
                         this.onDataCallback(content);
                         fullResponse += content;
                         process.stdout.write(content); // Stream to console
@@ -182,11 +185,11 @@ export default class LLMProvider implements Provider {
                 return fullResponse;
             } else {
                 // Extract response content from the first message
+                const resp = response as Anthropic.Messages.Message;
                 let resultStr = "";
-                if (response.type == "message") {
-                    resultStr = response.content[0].text;
-                } else {
-                    resultStr = JSON.stringify(response.error)
+                if (resp.type == "message") {
+                    let textBlock = resp.content[0] as Anthropic.Messages.TextBlock;
+                    resultStr = textBlock.text;
                 }
                 this.onDataCallback(resultStr);
                 finishOutputPanel();
