@@ -2,7 +2,7 @@
   "name": "ai-translate",
   "displayName": "AI Translate",
   "description": "Translate this text from English to Chinese, supporting text with comment symbols.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "publisher": "cfanbo",
   "icon": "img/logo.png",
   "repository": {
