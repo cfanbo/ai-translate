@@ -25,7 +25,9 @@
     "LLM",
     "AI Translation"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
