@@ -16,6 +16,11 @@ interface ProviderConfig {
     model: string;
 }
 
+interface PromptTemplate {
+    prompt: string;
+    systemPrompt: string;
+}
+
 interface Options {
     temperature?: number;
     max_tokens?: number;
@@ -23,6 +28,11 @@ interface Options {
     n?: number;
     stop?: string | null;
     stream?: boolean;
+}
+
+const defaultPromptTemplate: PromptTemplate = {
+    prompt: "Translate the following source text to {{to}}, Output translation directly without any additional text. \nSource Text: {{text}} \nTranslated Text:",
+    systemPrompt: "You are a highly skilled translation engine with expertise in the technology sector. Your function is to translate texts accurately into the target {{to}}, maintaining the original format, technical terms, and abbreviations. Do not add any explanations or annotations to the translated text."
 }
 
 // 默认值
@@ -37,15 +47,14 @@ const defaultOptions: Options = {
 export default class LLMProvider implements Provider {
     private onDataCallback: (chunk: string) => void;  // 回调函数
 
-    private systemPrompt: string;
-    private prompt: string = "";
+    // private prompt: string = "";
     private options: Options;
-    private target_language = 'Chinese';
-
+    private target_language = '';
+    private text: string = "";
     private providerConfig: ProviderConfig;
+    private promptTemplate: PromptTemplate = defaultPromptTemplate
 
-    constructor(options: Options = {}) {
-        // 读取配置
+    constructor() {
         const ext_config = vscode.workspace.getConfiguration('ai-translate');
 
         this.providerConfig = {
@@ -56,23 +65,26 @@ export default class LLMProvider implements Provider {
         }
 
         if (!this.providerConfig.baseUrl) {
-            throw new ConfigurationError("baseUrl 不能为空");
+            throw new ConfigurationError("The base URL cannot be empty.");
         }
         if (!this.providerConfig.apiKey) {
-            throw new ConfigurationError("apiKey 不能为空");
+            throw new ConfigurationError("The API key cannot be empty.");
         }
         if (!this.providerConfig.model) {
-            throw new ConfigurationError("model 不能为空");
+            throw new ConfigurationError("The LLM model cannot be empty");
         }
 
+        // target language
+        this.target_language = ext_config.get<string>('LLM.targetLanguage') || "";
 
-        this.systemPrompt = `
-        You are a highly skilled translation engine with expertise in the technology sector. Your function is to translate texts accurately into the target ${this.target_language},
-    maintaining the original format, technical terms, and abbreviations. Do not add any explanations or annotations to the translated text.
-    `;
+        // promptTemplate
+        let promptTmpl = ext_config.get<string>('LLM.prompt') || "";
+        if (promptTmpl !== "") {
+            this.promptTemplate.prompt = promptTmpl;
+        }
 
-        this.options = { ...defaultOptions, ...options };
-
+        // options
+        this.options = { ...defaultOptions };
         const max_tokens = ext_config.get<number>('LLM.maxTokens') || 1024;
         const temperature = ext_config.get<number>('LLM.Temperature') || 1.0;
         const streamEnabled = ext_config.get<boolean>('stream') || false;
@@ -86,25 +98,29 @@ export default class LLMProvider implements Provider {
         this.onDataCallback = showOutputPanel;
     }
 
-    public setSystemPrompt(systemPrompt: string): void {
-        this.systemPrompt = systemPrompt;
+    private getPrompt(): string {
+        let prompt = this.promptTemplate.prompt || "";
+        prompt = prompt.replace(/{{to}}/g, this.target_language);
+        prompt = prompt?.replace(/{{text}}/g, this.text);
+
+        return prompt;
     }
 
-    public setPrompt(text: string): void {
-        this.prompt = `
-        Translate the following source text to ${this.target_language}, Output translation directly without any additional text.
-        First Remove all comment symbols and their associated content. Ensure that any text following comment symbols (e.g., //, /*, <!--, etc.) is completely removed from the document.
-        Reorganize the paragraphs. Rearrange the remaining text into well-structured paragraphs, ensuring that the content flows logically and coherently.
-    Source Text: ${text}
-    Translated Text:
-        `;
+    private getSystemPrompt(): string {
+        let prompt = this.promptTemplate.systemPrompt || "";
+        prompt = prompt.replace(/{{to}}/g, this.target_language);
 
+        return prompt;
+    }
+
+    private setText(text: string): void {
+        this.text = text;
     }
 
     private async callOpenAI(): Promise<string | null> {
         const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-            { role: "system", content: this.systemPrompt },
-            { role: "user", content: this.prompt },
+            { role: "system", content: this.getSystemPrompt() },
+            { role: "user", content: this.getPrompt() },
         ];
 
         const client = new OpenAI({
@@ -153,7 +169,7 @@ export default class LLMProvider implements Provider {
 
     private async callAnthropic(): Promise<string | null> {
         const messages: Anthropic.Messages.MessageParam[] = [
-            { role: "user", content: this.prompt }
+            { role: "user", content: this.getPrompt() }
         ];
 
         const client = new Anthropic({ baseURL: this.providerConfig.baseUrl, apiKey: this.providerConfig.apiKey });
@@ -161,7 +177,7 @@ export default class LLMProvider implements Provider {
         try {
             const response = await client.messages.create({
                 model: this.providerConfig.model,
-                system: this.systemPrompt,
+                system: this.getSystemPrompt(),
                 messages: messages,
                 max_tokens: 1024,
                 // ...this.options,
@@ -203,7 +219,7 @@ export default class LLMProvider implements Provider {
         }
     }
     public async sendRequest(config: RequestConfig): Promise<any> {
-        this.setPrompt(config.input);
+        this.setText(config.input);
 
         if (this.providerConfig.provider === "Anthropic") {
             return await this.callAnthropic();
