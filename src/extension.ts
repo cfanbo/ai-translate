@@ -4,7 +4,6 @@ import * as vscode from 'vscode';
 import { sendHttpRequest } from './http'; // 假设 httpService.ts 在同一目录下
 import { showOutputPanel } from './util';
 import { ConfigurationError } from './error';
-import Anthropic from '@anthropic-ai/sdk';
 
 var Loading = false;
 
@@ -31,13 +30,13 @@ const serviceProvidersConfig: { [key: string]: ServiceProviderItem } = {
 		models: ['claude-3-5-sonnet-20240620', 'claude-3-haiku-20240307', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229'],
 		description: "https://docs.anthropic.com/en/docs/welcome"
 	},
-	// deepl: {
-	// 	name: "DeepL",
-	// 	baseurl: '',
-	// 	apikey: 'DeepL',
-	// 	models: [],
-	// 	description: ""
-	// },
+	deepl: {
+		name: "DeepL",
+		baseurl: 'https://api-free.deepl.com',
+		apikey: '',
+		models: [],
+		description: "https://www.deepl.com/"
+	},
 	// aws: {
 	// 	name: "AWS",
 	// 	baseurl: 'https://aws.io/openai/',

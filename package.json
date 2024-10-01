@@ -1,8 +1,8 @@
 {
   "name": "ai-translate",
   "displayName": "AI Translate",
-  "description": "Translate this text from English to Chinese, supporting text with comment symbols.",
-  "version": "0.2.3",
+  "description": "Translate the text content into other languages, leveraging LLM (Large Language Model) technology. support AI Agent",
+  "version": "0.3.0",
   "publisher": "cfanbo",
   "icon": "img/logo.png",
   "repository": {
@@ -25,9 +25,7 @@
     "LLM",
     "AI Translation"
   ],
-  "activationEvents": [
-    "*"
-  ],
+  "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -227,6 +225,7 @@
           "enum": [
             "OpenAI",
             "Anthropic",
+            "DeepL",
             "GLM",
             "Doubao",
             "Deepseek",
@@ -237,6 +236,7 @@
           "enumDescriptions": [
             "OpenAI",
             "Anthropic",
+            "DeepL",
             "智谱 GLM 大模型",
             "字节跳动 豆包 大模型",
             "DeepSeek",
@@ -288,8 +288,8 @@
         "ai-translate.LLM.Temperature": {
           "type": "number",
           "default": 1,
-          "minimum": 0.0,
-          "maximum": 2.0,
+          "minimum": 0,
+          "maximum": 2,
           "markdownDescription": "控制生成文本的随机性. 值越大文本越随机, 推荐设置为1.  介绍文档 [temperature](https://platform.openai.com/docs/api-reference/completions/create#completions-create-temperature)",
           "when": "ai-translate.LLM.ServiceProvider == 'LLM'",
           "order": 16
@@ -354,6 +354,7 @@
     "@anthropic-ai/sdk": "^0.27.3",
     "axios": "^1.7.7",
     "debug": "^4.3.7",
+    "deepl-node": "^1.14.0",
     "openai": "^4.65.0",
     "stream": "^0.0.3"
   }

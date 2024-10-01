@@ -7,7 +7,7 @@ import { ConfigurationError } from '../error';
 import { showOutputPanel, finishOutputPanel } from '../util';
 import { OpenAI } from "openai";
 import { Anthropic } from "@anthropic-ai/sdk";
-
+import DeepL from './deepl';
 
 interface ProviderConfig {
     provider: string;
@@ -70,9 +70,12 @@ export default class LLMProvider implements Provider {
         if (!this.providerConfig.apiKey) {
             throw new ConfigurationError("The API key cannot be empty.");
         }
-        if (!this.providerConfig.model) {
-            throw new ConfigurationError("The LLM model cannot be empty");
+        if (this.providerConfig.provider != "DeepL") {
+            if (!this.providerConfig.model) {
+                throw new ConfigurationError("The LLM model cannot be empty");
+            }
         }
+
 
         // target language
         this.target_language = ext_config.get<string>('LLM.targetLanguage') || "";
@@ -215,14 +218,24 @@ export default class LLMProvider implements Provider {
         } catch (error) {
             // Handle API or other errors
             console.error(`Error occurred: ${error}`);
-            return null;
+            throw error;
         }
     }
+
     public async sendRequest(config: RequestConfig): Promise<any> {
         this.setText(config.input);
 
         if (this.providerConfig.provider === "Anthropic") {
             return await this.callAnthropic();
+        } else if (this.providerConfig.provider == "DeepL") {
+            const deepLInstance = new DeepL(this.providerConfig.baseUrl, this.providerConfig.apiKey);
+            deepLInstance.setText(this.text).setTargetLang(this.target_language);
+            // deepLInstance.deepL().then(results => {
+            //     if (results) {
+            //         console.log(results); // 输出翻译结果
+            //     }
+            // });
+            return await deepLInstance.deepL();
         } else {
             return await this.callOpenAI();
         }
