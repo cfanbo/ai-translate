@@ -1,0 +1,48 @@
+name: Publish VSCode Extension
+
+on:
+  push:
+    branches:
+      - main  # 当推送到 main 分支时触发
+    tags:
+      - 'v*'  # 仅在以 v 开头的标签发布时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the extension
+        run: npm run compile  # 如果有编译步骤，请确保在这里运行
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')  # 仅在标签推送时执行
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Publish the extension
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub Token
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}  # Visual Studio Marketplace 的 PAT
+        run: |
+          echo $VSCE_PAT | npx vsce publish --pat
