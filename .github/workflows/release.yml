@@ -2,8 +2,8 @@ name: Publish VSCode Extension
 
 on:
   push:
-    branches:
-      - main  # 当推送到 main 分支时触发
+    # branches:
+    #   - main  # 当推送到 main 分支时触发
     tags:
       - 'v*'  # 仅在以 v 开头的标签发布时触发
 
