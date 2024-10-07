@@ -8,7 +8,7 @@
 
 它的优势是相比传统翻译工具更专业、友好，更加贴合技术背景。
 
-> 如果您使用的是 JetBrains 系列IDE工具，则需要安装对应IDE版本插件 https://plugins.jetbrains.com/plugin/25313-ai-translate
+> 如果您使用的是 JetBrains 系列IDE工具，则参考另一个项目 https://github.com/cfanbo/intellij-ai-translate/
 
 ## Features
 
