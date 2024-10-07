@@ -38,10 +38,19 @@ AI翻译效果
 
 ## Requirements
 
-翻译功能主要是由LLM来提供，目前支持 `阿里去百炼` 和 字节跳动`扣子(coze) `，可根据不同服务提供商查看获取相关配置参数：
+翻译功能主要是由LLM来提供，目前支持的服务提供商：
 
-- [阿里云百炼](./docs/bailian.md) 获取 `APP_ID` 和 `APP_KEY`
-- [扣子 coze](./docs/coze.md) 获取 `BotID` 和 `token`
+- OpenAI
+- Anthropic
+- DeepL
+- 智谱 GLM
+- 豆包大模型（字节跳动）
+- DeepSeek
+- Alibaba
+- GitHub
+- Gemini
+- [阿里云百炼-智能体](./docs/bailian.md) 获取 `APP_ID` 和 `APP_KEY`
+- [扣子coze-智能体](./docs/coze.md) 获取 `BotID` 和 `token`
 
 ## install Extension
 
