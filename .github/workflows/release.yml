@@ -45,4 +45,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub Token
           VSCE_PAT: ${{ secrets.VSCE_PAT }}  # Visual Studio Marketplace 的 PAT
         run: |
-          echo $VSCE_PAT | npx vsce publish --pat
+          npx vsce publish --pat $VSCE_PAT
