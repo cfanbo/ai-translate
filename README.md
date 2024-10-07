@@ -4,7 +4,7 @@
     <img src="./img/logo.png" alt="AI Translate" />
 </div>
 
-`ai-translate` 是一款基于阿里巴巴大模型"通义千问"开发的 VSCode 翻译插件，专为开发者设计，主要用在IDE环境中对英文内容进行翻译。
+`ai-translate` 是一款基于大语言模型开发的 VSCode 翻译插件，专为开发者设计，主要用在IDE环境中对英文内容进行翻译。
 
 它的优势是相比传统翻译工具更专业、友好，更加贴合技术背景。
 
